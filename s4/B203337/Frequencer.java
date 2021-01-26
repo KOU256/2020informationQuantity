@@ -72,22 +72,19 @@ public class Frequencer implements FrequencerInterface{
 
         // ここにコードを記述せよ
         //
-        byte[] suffix_i = Arrays.copyOfRange(mySpace, i, mySpace.length);
-        byte[] suffix_j = Arrays.copyOfRange(mySpace, j, mySpace.length);
-
-        for (int k = 0; k < suffix_i.length && k < suffix_j.length; k++) {
-            if (suffix_i[k] > suffix_j[k]) {
+        for (int k = 0; k < mySpace.length - i && k < mySpace.length - j; k++) {
+            if (mySpace[i + k] > mySpace[j + k]) {
                 return 1;
             }
-            else if (suffix_i[k] < suffix_j[k]) {
+            else if (mySpace[i + k] < mySpace[j + k]) {
                 return -1;
             }
         }
 
-        if (suffix_i.length > suffix_j.length) {
+        if (mySpace.length - i > mySpace.length - j) {
             return 1;
         }
-        else if (suffix_i.length < suffix_j.length) {
+        else if (mySpace.length - i < mySpace.length - j) {
             return -1;
         }
         else {
@@ -224,19 +221,15 @@ public class Frequencer implements FrequencerInterface{
         //
         // ここに比較のコードを書け
         //
-        byte[] suffix_i = Arrays.copyOfRange(mySpace, i, mySpace.length);
-        byte[] target_j_k = Arrays.copyOfRange(myTarget, j, k);
-
-        for (int l = 0; l < Math.min(suffix_i.length, target_j_k.length); l++) {
-            if (suffix_i[l] > target_j_k[l]) {
+        for (int l = 0; l < mySpace.length - i && l < k - j; l++) {
+            if (mySpace[i + l] > myTarget[j + l]) {
                 return 1;
             }
-            else if (suffix_i[l] < target_j_k[l]) {
+            else if (mySpace[i + l] < myTarget[j + l]) {
                 return -1;
             }
         }
-
-        if (suffix_i.length < target_j_k.length) {
+        if (mySpace.length - i < k - j) {
             return -1;
         }
         else {
@@ -275,33 +268,30 @@ public class Frequencer implements FrequencerInterface{
         //
         // ここにコードを記述せよ。
         //
-        return binarySearchStartIndex(0, suffixArray.length, start, end);
+        // 先に両端をチェック
+        if (targetCompare(suffixArray[0], start, end) >= 0) {
+            return 0;
+        }
+        else if (targetCompare(suffixArray[suffixArray.length - 1], start, end) == -1) {
+            return suffixArray.length;
+        }
+        return binarySearchStartIndex(1, suffixArray.length - 1, start, end);
     }
 
     private int binarySearchStartIndex(int min, int max, int start, int end) {
-        if (max - min == 1) {
-            if (targetCompare(suffixArray[min], start, end) == 0) {
-                return min;
-            }
-            else {
+        int mid = (min + max) / 2;
+        if (targetCompare(suffixArray[mid], start, end) == -1) {
+            if (max - min <= 1) {
                 return max;
             }
+            return binarySearchStartIndex(mid, max, start, end);
         }
         else {
-            int mid = (min + max) / 2;
-            int result = targetCompare(suffixArray[mid], start, end);
-            if (result == -1) {
-                return binarySearchStartIndex(mid, max, start, end);
+            if (max - min <= 1) {
+                return min;
             }
-            else if (result == 0) {
-                return binarySearchStartIndex(min, mid, start, end);
-            }
-            else if (result == 1) {
-                return binarySearchStartIndex(min, mid, start, end);
-            }
+            return binarySearchStartIndex(min, mid, start, end);
         }
-
-        return 0;
     }
 
     private int subByteEndIndex(int start, int end) {
@@ -333,33 +323,30 @@ public class Frequencer implements FrequencerInterface{
         //
         //　ここにコードを記述せよ
         //
-        return binarySearchEndIndex(0, suffixArray.length, start, end);
+        // 先に両端をチェック
+        if (targetCompare(suffixArray[0], start, end) == 1) {
+            return 0;
+        }
+        else if (targetCompare(suffixArray[suffixArray.length - 1], start, end) <= 0) {
+            return suffixArray.length;
+        }
+        return binarySearchEndIndex(1, suffixArray.length - 1, start, end);
     }
 
     private int binarySearchEndIndex(int min, int max, int start, int end) {
-        if (max - min == 1) {
-            if (targetCompare(suffixArray[min], start, end) == 1) {
+        int mid = (min + max) / 2;
+        if (targetCompare(suffixArray[mid], start, end) == 1) {
+            if (max - min <= 1) {
                 return min;
             }
-            else {
-                return max;
-            }
+            return binarySearchEndIndex(min, mid, start, end);
         }
         else {
-            int mid = (min + max) / 2;
-            int result = targetCompare(suffixArray[mid], start, end);
-            if (result == -1) {
-                return binarySearchEndIndex(mid, max, start, end);
+            if (max - min <= 1) {
+                return max;
             }
-            else if (result == 0) {
-                return binarySearchEndIndex(mid, max, start, end);
-            }
-            else if (result == 1) {
-                return binarySearchEndIndex(min, mid, start, end);
-            }
+            return binarySearchEndIndex(mid, max, start, end);
         }
-
-        return suffixArray.length;
     }
 
     // Suffix Arrayを使ったプログラムのホワイトテストは、
