@@ -1,6 +1,8 @@
 package s4.B203337; // Please modify to s4.Bnnnnnn, where nnnnnn is your student ID. 
 import java.lang.*;
 import s4.specification.*;
+
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /*
@@ -119,45 +121,32 @@ public class Frequencer implements FrequencerInterface{
         //   suffixArray[ 2]= 0:CBA
         // のようになるべきである。
 
-        heapSort(suffixArray);
+        mergeSort(suffixArray);
     }
 
-    private void heapSort(int[] array) {
-        int n = array.length;
+    private void mergeSort(int[] array) {
+        if (array.length > 1) {
+            int mid = array.length / 2;
+            int[] left = Arrays.copyOfRange(array, 0, mid);
+            int[] right = Arrays.copyOfRange(array, mid, array.length);
 
-        for (int i = n / 2 - 1; i >= 0; i--) {
-            constructHeap(array, n, i);
+            mergeSort(left);
+            mergeSort(right);
+            merge(array, left, right);
         }
+    }
 
-        for (int i = n - 1; i >= 0; i--) {
-            if (suffixCompare(array[0], array[i]) == 1) {
-                int tmp = array[0];
-                array[0] = array[i];
-                array[i] = tmp;
-
-                constructHeap(array, i - 1, 0);
+    private void merge(int[] array, int[] left, int[] right) {
+        int i = 0, j = 0;
+        while (i < left.length || j < right.length) {
+            if (j >= right.length || (i < left.length && suffixCompare(left[i], right[j]) == -1)) {
+                array[i + j] = left[i];
+                i++;
             }
-        }
-    }
-
-    private void constructHeap(int[] array, int n, int root) {
-        int max = root;
-        int left = 2 * root + 1;
-        int right = 2 * root + 2;
-
-        if (left < n && suffixCompare(array[left], array[max]) == 1) {
-            max = left;
-        }
-        if (right < n && suffixCompare(array[right], array[max]) == 1) {
-            max = right;
-        }
-
-        if (max != root) {
-            int tmp = array[root];
-            array[root] = array[max];
-            array[max] = tmp;
-
-            constructHeap(array, n, max);
+            else {
+                array[i + j] = right[j];
+                j++;
+            }
         }
     }
 
